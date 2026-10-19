@@ -15,7 +15,7 @@ For the stable build, use the official bucket instead: `scoop install extras/cha
 ### Add this bucket
 
 ```powershell
-scoop bucket add scoop-bucket https://git.falkenby.com/hyzor/scoop-bucket.git
+scoop bucket add scoop-bucket https://github.com/hyzor/scoop-bucket.git
 ```
 
 The first argument is whatever you want to call the bucket locally; `scoop-bucket`
