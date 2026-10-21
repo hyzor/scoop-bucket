@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-17",
+  "version": "nightly",
   "description": "Twitch chat client (nightly build)",
   "homepage": "https://chatterino.com",
   "license": "MIT",
@@ -11,8 +11,7 @@
   },
   "architecture": {
     "64bit": {
-      "url": "https://github.com/Chatterino/chatterino2/releases/download/nightly-build/chatterino-windows-x86-64-Qt-6.8.3.zip",
-      "hash": "15948fa41236fef6158f7e1e28587fa313da8a63eb35d31091567a4930286b4e"
+      "url": "https://github.com/Chatterino/chatterino2/releases/download/nightly-build/chatterino-windows-x86-64-Qt-6.8.3.zip"
     }
   },
   "extract_dir": "Chatterino2",
@@ -30,19 +29,5 @@
     "ProfileAvatars",
     "Settings",
     "Themes"
-  ],
-  "checkver": {
-    "script": [
-      "$r = Invoke-RestMethod 'https://api.github.com/repos/Chatterino/chatterino2/releases/tags/nightly-build'",
-      "($r.assets | Where-Object { $_.name -like 'chatterino-windows-*.zip' } | Select-Object -First 1).updated_at.ToString('yyyy-MM-dd')"
-    ],
-    "regex": "(\\d{4}-\\d{2}-\\d{2})"
-  },
-  "autoupdate": {
-    "architecture": {
-      "64bit": {
-        "url": "https://github.com/Chatterino/chatterino2/releases/download/nightly-build/chatterino-windows-x86-64-Qt-6.8.3.zip"
-      }
-    }
-  }
+  ]
 }

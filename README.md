@@ -29,8 +29,15 @@ scoop install .\<app>.json
 
 ```powershell
 scoop update
+scoop bucket update scoop-bucket
+scoop update *
 scoop update <app>
 ```
+
+`scoop update` on its own refreshes the bucket clones, which is what pulls new
+manifests down. `scoop update *` only updates installed apps, and it re-pulls
+buckets only when Scoop itself has an update, so refresh the bucket first or use
+`scoop bucket update scoop-bucket`.
 
 ### Uninstall
 
@@ -53,13 +60,32 @@ For the stable build, use the official bucket instead:
 
 Notes:
 
-- The nightly release tag (`nightly-build`) has a fixed `published_at`, so the
-  manifest derives the version from the Windows asset's `updated_at` instead.
+- The manifest uses Scoop's built-in nightly support (`"version": "nightly"`).
+  Scoop stamps every install with the date it was made (`nightly-YYYYMMDD`) and
+  skips hash verification for it, so a new build is picked up without editing or
+  committing anything. Scoop never runs `checkver` during `scoop update`, which
+  is why the previous date-in-`version` scheme never noticed new builds.
+- Scoop only treats nightly apps as out of date when nightly comparison is
+  enabled. Enable it once:
+
+  ```powershell
+  scoop config UPDATE_NIGHTLY $true
+  ```
+
+  This is a global setting: every `"version": "nightly"` app from any bucket is
+  then reported as outdated once per calendar day.
+- Versions are compared per calendar day, so a build published later on the same
+  day only shows up with the next day's update. To grab the current build right
+  away, force it:
+
+  ```powershell
+  scoop update chatterino-nightly --force
+  ```
 - The Windows archive name includes the Qt version
   (`chatterino-windows-x86-64-Qt-6.8.3.zip`). When Chatterino upgrades Qt, the
-  `url` in both `architecture.64bit` and `autoupdate` must be bumped.
-- The nightly build has no published checksums. If no `hash` is present under
-  `autoupdate`, Scoop downloads the archive and hashes it locally.
+  `url` must be updated to the new asset name.
+- The nightly archive is rebuilt in place and has no published checksums, so
+  the manifest carries no `hash` and Scoop does not verify the download.
 
 ## How the manifests work
 
@@ -69,23 +95,28 @@ Notes:
 - `bin` / `shortcuts` point at the executable inside that folder.
 - `persist` keeps settings, logs, themes etc. across updates.
 - `hash` pins the downloaded archive; Scoop refuses to install on a mismatch.
+  Nightly apps have no stable hash, so Scoop skips the check for them.
 
 ## Maintaining this bucket
 
-Check for a new version:
+`chatterino-nightly` deliberately has no `checkver`/`autoupdate`: the version is
+the literal string `nightly` and Scoop fills in the date itself. Running
+`bin\checkver.ps1 -u` would replace `"version": "nightly"` with a fixed date and
+break automatic updates again, so do not run it on this manifest.
+
+The only thing that can go stale is the asset name in `url`. Check the current
+nightly assets with:
 
 ```powershell
-& "$env:USERPROFILE\scoop\apps\scoop\current\bin\checkver.ps1" <app>
+(Invoke-RestMethod 'https://api.github.com/repos/Chatterino/chatterino2/releases/tags/nightly-build').assets.name
 ```
 
-Update the manifest automatically:
+If the Windows zip is no longer named `chatterino-windows-x86-64-Qt-6.8.3.zip`,
+update `url` to match.
 
-```powershell
-& "$env:USERPROFILE\scoop\apps\scoop\current\bin\checkver.ps1" <app> -u
-```
-
-Test the result with:
+Test a manifest change with:
 
 ```powershell
 scoop install .\<app>.json
+scoop update <app>
 ```
