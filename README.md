@@ -87,6 +87,28 @@ Notes:
 - The nightly archive is rebuilt in place and has no published checksums, so
   the manifest carries no `hash` and Scoop does not verify the download.
 
+#### Taskbar pin keeps launching an old build
+
+Pinning Chatterino to the taskbar stores the folder the exe really lives in,
+e.g. `...\apps\chatterino-nightly\nightly-20261022\chatterino.exe`, not the
+`current` junction. Each nightly update installs into a new dated folder and
+moves `current`, so the pin keeps launching the folder it was made from (old
+folders stay on disk until `scoop cleanup` removes them).
+
+Point the pin at the junction instead; it then follows every update:
+
+```powershell
+$pin = "$env:APPDATA\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\Chatterino.lnk"
+$shell = New-Object -ComObject WScript.Shell
+$s = $shell.CreateShortcut($pin)
+$s.TargetPath = "$env:USERPROFILE\scoop\apps\chatterino-nightly\current\chatterino.exe"
+$s.WorkingDirectory = "$env:USERPROFILE\scoop\apps\chatterino-nightly\current"
+$s.Save()
+```
+
+If the taskbar still starts the old build afterwards, restart Explorer or sign
+out and back in so it drops its cached pinned item.
+
 ## How the manifests work
 
 - `url` points directly at the release archive. Scoop downloads it for you.
