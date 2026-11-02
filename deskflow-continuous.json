@@ -1,0 +1,28 @@
+{
+  "version": "nightly",
+  "description": "Share a single keyboard and mouse between multiple computers (continuous pre-release)",
+  "homepage": "https://deskflow.org",
+  "license": "GPL-2.0",
+  "notes": [
+    "Scoop installs the portable build, which hides the Windows background service options.",
+    "For login screen and UAC support, use the official MSI installer.",
+    "Settings are persisted in $persist_dir\\settings."
+  ],
+  "suggest": {
+    "Microsoft Visual C++ Redistributable": "extras/vcredist"
+  },
+  "architecture": {
+    "64bit": {
+      "url": "https://github.com/deskflow/deskflow/releases/download/continuous/deskflow-continuous-win-x64-portable.zip",
+      "extract_dir": "deskflow-continuous-win-x64-portable"
+    }
+  },
+  "bin": "deskflow-core.exe",
+  "shortcuts": [
+    [
+      "deskflow.exe",
+      "Deskflow"
+    ]
+  ],
+  "persist": "settings"
+}
